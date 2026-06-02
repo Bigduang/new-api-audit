@@ -9,6 +9,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/QuantumNous/new-api/audit"
 	"github.com/QuantumNous/new-api/common"
 	"github.com/QuantumNous/new-api/constant"
 	"github.com/QuantumNous/new-api/dto"
@@ -125,12 +126,32 @@ func Relay(c *gin.Context, relayFormat types.RelayFormat) {
 
 	needSensitiveCheck := setting.ShouldCheckPromptSensitive()
 	needCountToken := constant.CountToken
+	needAuditPrompt := audit.EnabledForToken(c.GetString("token_name"))
 	// Avoid building huge CombineText (strings.Join) when token counting and sensitive check are both disabled.
 	var meta *types.TokenCountMeta
-	if needSensitiveCheck || needCountToken {
+	if needSensitiveCheck || needCountToken || needAuditPrompt {
 		meta = request.GetTokenCountMeta()
 	} else {
 		meta = fastTokenCountMetaForPricing(request)
+	}
+
+	if needAuditPrompt && meta != nil {
+		promptText := meta.CombineText
+		audit.EnqueueRequest(audit.RequestEvent{
+			RequestId:     requestId,
+			CreatedAt:     time.Now().UTC().Format(time.RFC3339Nano),
+			UserId:        relayInfo.UserId,
+			Username:      c.GetString("username"),
+			TokenId:       relayInfo.TokenId,
+			TokenName:     c.GetString("token_name"),
+			ModelName:     relayInfo.OriginModelName,
+			RequestPath:   c.Request.URL.Path,
+			RelayFormat:   string(relayFormat),
+			IsStream:      relayInfo.IsStream,
+			PromptHash:    audit.HashText(promptText),
+			PromptPreview: audit.PreviewText(promptText, 500),
+			PromptText:    promptText,
+		})
 	}
 
 	if needSensitiveCheck && meta != nil {

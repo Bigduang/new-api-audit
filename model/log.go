@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/QuantumNous/new-api/audit"
 	"github.com/QuantumNous/new-api/common"
 	"github.com/QuantumNous/new-api/logger"
 	"github.com/QuantumNous/new-api/types"
@@ -221,6 +222,7 @@ type RecordConsumeLogParams struct {
 
 func RecordConsumeLog(c *gin.Context, userId int, params RecordConsumeLogParams) {
 	if !common.LogConsumeEnabled {
+		enqueueAuditUsage(c, userId, params)
 		return
 	}
 	logger.LogInfo(c, fmt.Sprintf("record consume log: userId=%d, params=%s", userId, common.GetJsonString(params)))
@@ -265,11 +267,32 @@ func RecordConsumeLog(c *gin.Context, userId int, params RecordConsumeLogParams)
 	if err != nil {
 		logger.LogError(c, "failed to record log: "+err.Error())
 	}
+	enqueueAuditUsage(c, userId, params)
 	if common.DataExportEnabled {
 		gopool.Go(func() {
 			LogQuotaData(userId, username, params.ModelName, params.Quota, common.GetTimestamp(), params.PromptTokens+params.CompletionTokens)
 		})
 	}
+}
+
+func enqueueAuditUsage(c *gin.Context, userId int, params RecordConsumeLogParams) {
+	audit.EnqueueUsage(audit.UsageEvent{
+		RequestId:         c.GetString(common.RequestIdKey),
+		CreatedAt:         time.Now().UTC().Format(time.RFC3339Nano),
+		UserId:            userId,
+		Username:          c.GetString("username"),
+		TokenId:           params.TokenId,
+		TokenName:         params.TokenName,
+		ModelName:         params.ModelName,
+		PromptTokens:      params.PromptTokens,
+		CompletionTokens:  params.CompletionTokens,
+		Quota:             params.Quota,
+		ChannelId:         params.ChannelId,
+		Group:             params.Group,
+		UseTimeSeconds:    params.UseTimeSeconds,
+		IsStream:          params.IsStream,
+		UpstreamRequestId: c.GetString(common.UpstreamRequestIdKey),
+	})
 }
 
 type RecordTaskBillingLogParams struct {
