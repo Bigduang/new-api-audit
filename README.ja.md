@@ -74,6 +74,7 @@ New-API 既存のログとデータベースは利用量集計には十分です
 - `request_id` で prompt と最終 token 使用量を関連付ける。
 - 送信は非同期・非ブロッキングキューを使い、監査サービス障害時も通常 API リクエストを止めない。
 - 完全 prompt は New-API 主データベースに書かず、独立監査サービスで暗号化保存する。
+- 監査サービスは本番環境でもローカル SQLite ファイル DB をデフォルトで使用し、30 日保持ポリシーで履歴データを削除します。追加の MySQL サービスは不要です。
 - 分類、レポート、レビュー、通知はすべて `token-audit` 側で進化させる。
 
 ## フロー
@@ -90,7 +91,7 @@ token-audit service
     |
     | request_id で prompt と token usage を関連付け
     v
-独立監査データベース
+独立監査 SQLite ファイル DB
     |
     v
 分類、レポート、手動レビュー、WeCom 通知
@@ -126,7 +127,7 @@ AUDIT_EXCLUDED_TOKEN_NAMES=audit-classifier
 
 本番環境では次の順序を推奨します：
 
-1. 先に独立した `token-audit` サービスと監査データベースをデプロイする。
+1. 先に独立した `token-audit` サービスをデプロイする。監査 DB はローカル SQLite ファイルで、例：`/opt/token-audit/data/token_audit.db`。
 2. この fork の New-API イメージをビルドしてデプロイする。ただし最初は `AUDIT_ENABLED=false` にする。
 3. CPA、New-API、上流モデル呼び出しがすべて正常であることを確認する。
 4. `AUDIT_ENABLED=true` にして shadow reporting を開始する。

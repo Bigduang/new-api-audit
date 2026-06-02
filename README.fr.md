@@ -74,6 +74,7 @@ Ce fork utilise donc le modèle "collecte minimale dans New-API + traitement ind
 - `request_id` relie le prompt à l'utilisation finale.
 - L'envoi est asynchrone et non bloquant, afin qu'une panne du service d'audit ne bloque pas les requêtes API.
 - Les prompts complets ne sont pas écrits dans la base principale New-API ; ils sont chiffrés par le service d'audit.
+- Le service d'audit utilise par défaut une base SQLite locale en production, avec une rétention de 30 jours. Aucun service MySQL supplémentaire n'est requis.
 - Classification, rapports, revue et notifications évoluent dans `token-audit`.
 
 ## Flux
@@ -90,7 +91,7 @@ service token-audit
     |
     | request_id relie prompt et token usage
     v
-base d'audit indépendante
+base d'audit SQLite locale
     |
     v
 classification, rapports, revue, push WeCom
@@ -126,7 +127,7 @@ AUDIT_EXCLUDED_TOKEN_NAMES=audit-classifier
 
 Déploiement recommandé en production :
 
-1. Déployer d'abord le service `token-audit` et la base d'audit.
+1. Déployer d'abord le service `token-audit`. La base d'audit est un fichier SQLite local, par exemple `/opt/token-audit/data/token_audit.db`.
 2. Construire et déployer l'image New-API de ce fork avec `AUDIT_ENABLED=false`.
 3. Vérifier que CPA, New-API et les appels aux modèles upstream fonctionnent normalement.
 4. Passer `AUDIT_ENABLED=true` pour entrer en mode shadow reporting.

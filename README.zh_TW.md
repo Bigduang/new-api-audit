@@ -74,6 +74,7 @@ New-API 原有日誌和資料庫適合做用量統計，但不足以完成「工
 - `request_id` 用於關聯 prompt 和最終用量。
 - 上報使用非同步非阻塞佇列，稽核服務故障不阻斷正常 API 請求。
 - prompt 原文不寫入 New-API 主庫，由獨立稽核服務加密保存。
+- 稽核服務生產預設使用本機 SQLite 檔案庫，並按 30 天保留策略清理歷史資料，不需要額外部署 MySQL。
 - 分類、報表、複核和推送全部放在 `token-audit` 服務側演進。
 
 ## 工作流程
@@ -90,7 +91,7 @@ token-audit 服務
     |
     | request_id 關聯 prompt 與 token usage
     v
-獨立稽核資料庫
+獨立稽核 SQLite 檔案庫
     |
     v
 分類、報表、人工複核、企業微信推送
@@ -126,7 +127,7 @@ AUDIT_EXCLUDED_TOKEN_NAMES=audit-classifier
 
 生產環境推薦按以下順序上線：
 
-1. 先部署獨立 `token-audit` 服務和稽核資料庫。
+1. 先部署獨立 `token-audit` 服務，稽核庫使用本機 SQLite 檔案，例如 `/opt/token-audit/data/token_audit.db`。
 2. 構建並部署這個 fork 的 New-API 映像，但先設定 `AUDIT_ENABLED=false`。
 3. 確認 CPA、New-API、上游模型呼叫全部正常。
 4. 將 `AUDIT_ENABLED=true`，進入 shadow 上報階段。

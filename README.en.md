@@ -74,6 +74,7 @@ This fork therefore uses a "minimal New-API collection + independent audit proce
 - `request_id` links prompt data with final usage.
 - Reporting uses an async non-blocking queue, so audit service failures do not block API requests.
 - Full prompts are not written to the New-API main database; they are encrypted and stored by the audit service.
+- The audit service uses a local SQLite file database by default in production, with a 30-day retention policy. No extra MySQL service is required.
 - Classification, reports, manual review, and push notifications evolve independently in `token-audit`.
 
 ## Flow
@@ -90,7 +91,7 @@ token-audit service
     |
     | request_id links prompt and token usage
     v
-independent audit database
+independent audit SQLite file database
     |
     v
 classification, reports, review, WeCom push
@@ -126,7 +127,7 @@ AUDIT_EXCLUDED_TOKEN_NAMES=audit-classifier
 
 Recommended production rollout:
 
-1. Deploy the independent `token-audit` service and audit database first.
+1. Deploy the independent `token-audit` service first. The audit database is a local SQLite file, for example `/opt/token-audit/data/token_audit.db`.
 2. Build and deploy this fork's New-API image with `AUDIT_ENABLED=false`.
 3. Confirm CPA, New-API, and upstream model calls still work normally.
 4. Set `AUDIT_ENABLED=true` and enter shadow reporting mode.
