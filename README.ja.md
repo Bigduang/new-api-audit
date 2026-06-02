@@ -109,7 +109,8 @@ New-API は従来どおり認証、ルーティング、転送、課金、ログ
 | `AUDIT_ENDPOINT` | 空 | 監査サービス URL。例：`http://token-audit:8000` |
 | `AUDIT_SECRET` | 空 | New-API と監査サービスで共有する HMAC secret |
 | `AUDIT_TIMEOUT_MS` | `800` | 1 イベントあたりの送信 timeout、ミリ秒 |
-| `AUDIT_QUEUE_SIZE` | `10000` | 非同期送信キューのサイズ |
+| `AUDIT_QUEUE_SIZE` | `1000` | 非同期送信キューのサイズ |
+| `AUDIT_MAX_EVENT_BYTES` | `1048576` | Maximum serialized audit event size in bytes; oversized request events omit full prompt text and send only hash/preview/length, while other oversized events are dropped |
 | `AUDIT_EXCLUDED_TOKEN_NAMES` | 空 | 監査対象外 token 名のカンマ区切りリスト。分類器用 token の除外に使う |
 
 推奨設定：
@@ -119,7 +120,8 @@ AUDIT_ENABLED=true
 AUDIT_ENDPOINT=http://token-audit:8000
 AUDIT_SECRET=replace-with-long-random-secret
 AUDIT_TIMEOUT_MS=800
-AUDIT_QUEUE_SIZE=10000
+AUDIT_QUEUE_SIZE=1000
+AUDIT_MAX_EVENT_BYTES=1048576
 AUDIT_EXCLUDED_TOKEN_NAMES=audit-classifier
 ```
 
@@ -145,7 +147,8 @@ services:
       AUDIT_ENDPOINT: "http://token-audit:8000"
       AUDIT_SECRET: "${AUDIT_SECRET}"
       AUDIT_TIMEOUT_MS: "800"
-      AUDIT_QUEUE_SIZE: "10000"
+      AUDIT_QUEUE_SIZE: "1000"
+      AUDIT_MAX_EVENT_BYTES: "1048576"
       AUDIT_EXCLUDED_TOKEN_NAMES: "audit-classifier"
     depends_on:
       - token-audit

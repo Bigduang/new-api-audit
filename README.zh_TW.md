@@ -109,7 +109,8 @@ New-API 仍然按原來的方式完成鑑權、路由、轉發、計費和日誌
 | `AUDIT_ENDPOINT` | 空 | 稽核服務地址，例如 `http://token-audit:8000` |
 | `AUDIT_SECRET` | 空 | New-API 與稽核服務共享的 HMAC 密鑰 |
 | `AUDIT_TIMEOUT_MS` | `800` | 單次上報請求逾時時間，單位毫秒 |
-| `AUDIT_QUEUE_SIZE` | `10000` | 非同步上報佇列長度 |
+| `AUDIT_QUEUE_SIZE` | `1000` | 非同步上報佇列長度 |
+| `AUDIT_MAX_EVENT_BYTES` | `1048576` | 單個稽核事件序列化後的最大位元組數；超大 request 事件會省略完整 prompt，僅發送 hash/preview/長度，其他超限事件會被丟棄 |
 | `AUDIT_EXCLUDED_TOKEN_NAMES` | 空 | 逗號分隔的 token 名稱排除列表，用於排除稽核服務自己的 LLM 分類請求 |
 
 推薦設定：
@@ -119,7 +120,8 @@ AUDIT_ENABLED=true
 AUDIT_ENDPOINT=http://token-audit:8000
 AUDIT_SECRET=replace-with-long-random-secret
 AUDIT_TIMEOUT_MS=800
-AUDIT_QUEUE_SIZE=10000
+AUDIT_QUEUE_SIZE=1000
+AUDIT_MAX_EVENT_BYTES=1048576
 AUDIT_EXCLUDED_TOKEN_NAMES=audit-classifier
 ```
 
@@ -145,7 +147,8 @@ services:
       AUDIT_ENDPOINT: "http://token-audit:8000"
       AUDIT_SECRET: "${AUDIT_SECRET}"
       AUDIT_TIMEOUT_MS: "800"
-      AUDIT_QUEUE_SIZE: "10000"
+      AUDIT_QUEUE_SIZE: "1000"
+      AUDIT_MAX_EVENT_BYTES: "1048576"
       AUDIT_EXCLUDED_TOKEN_NAMES: "audit-classifier"
     depends_on:
       - token-audit

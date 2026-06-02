@@ -109,7 +109,8 @@ Ce fork ajoute les variables suivantes côté New-API :
 | `AUDIT_ENDPOINT` | vide | URL du service d'audit, par exemple `http://token-audit:8000` |
 | `AUDIT_SECRET` | vide | Secret HMAC partagé entre New-API et le service d'audit |
 | `AUDIT_TIMEOUT_MS` | `800` | Timeout par événement en millisecondes |
-| `AUDIT_QUEUE_SIZE` | `10000` | Taille de la file asynchrone |
+| `AUDIT_QUEUE_SIZE` | `1000` | Taille de la file asynchrone |
+| `AUDIT_MAX_EVENT_BYTES` | `1048576` | Maximum serialized audit event size in bytes; oversized request events omit full prompt text and send only hash/preview/length, while other oversized events are dropped |
 | `AUDIT_EXCLUDED_TOKEN_NAMES` | vide | Liste de noms de tokens exclus, séparés par des virgules, utilisée pour le token du classificateur |
 
 Configuration recommandée :
@@ -119,7 +120,8 @@ AUDIT_ENABLED=true
 AUDIT_ENDPOINT=http://token-audit:8000
 AUDIT_SECRET=replace-with-long-random-secret
 AUDIT_TIMEOUT_MS=800
-AUDIT_QUEUE_SIZE=10000
+AUDIT_QUEUE_SIZE=1000
+AUDIT_MAX_EVENT_BYTES=1048576
 AUDIT_EXCLUDED_TOKEN_NAMES=audit-classifier
 ```
 
@@ -145,7 +147,8 @@ services:
       AUDIT_ENDPOINT: "http://token-audit:8000"
       AUDIT_SECRET: "${AUDIT_SECRET}"
       AUDIT_TIMEOUT_MS: "800"
-      AUDIT_QUEUE_SIZE: "10000"
+      AUDIT_QUEUE_SIZE: "1000"
+      AUDIT_MAX_EVENT_BYTES: "1048576"
       AUDIT_EXCLUDED_TOKEN_NAMES: "audit-classifier"
     depends_on:
       - token-audit
