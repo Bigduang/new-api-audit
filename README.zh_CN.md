@@ -8,10 +8,10 @@
 
 <p align="center">
   <strong>简体中文</strong> |
-  <a href="./README.en.md">Original English README</a> |
-  <a href="./README.zh_TW.md">Original Traditional Chinese README</a> |
-  <a href="./README.fr.md">Original French README</a> |
-  <a href="./README.ja.md">Original Japanese README</a>
+  <a href="./README.en.md">English</a> |
+  <a href="./README.zh_TW.md">繁體中文</a> |
+  <a href="./README.fr.md">Français</a> |
+  <a href="./README.ja.md">日本語</a>
 </p>
 
 </div>
