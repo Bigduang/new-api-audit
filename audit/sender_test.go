@@ -36,6 +36,32 @@ func TestEnqueueDropsWhenQueueIsFull(t *testing.T) {
 	}
 }
 
+func TestEnqueueDropsRequestWithoutRequestId(t *testing.T) {
+	q := make(chan outboundEvent, 1)
+	useTestConfig(config{enabled: true, excluded: map[string]struct{}{}}, q)
+
+	EnqueueRequest(RequestEvent{RequestId: " \t\n", PromptText: "hello"})
+
+	select {
+	case event := <-q:
+		t.Fatalf("expected request without request_id to be dropped, got %s", event.path)
+	default:
+	}
+}
+
+func TestEnqueueDropsUsageWithoutRequestId(t *testing.T) {
+	q := make(chan outboundEvent, 1)
+	useTestConfig(config{enabled: true, excluded: map[string]struct{}{}}, q)
+
+	EnqueueUsage(UsageEvent{RequestId: ""})
+
+	select {
+	case event := <-q:
+		t.Fatalf("expected usage without request_id to be dropped, got %s", event.path)
+	default:
+	}
+}
+
 func TestEnqueueDropsOversizedEvent(t *testing.T) {
 	q := make(chan outboundEvent, 1)
 	useTestConfig(config{enabled: true, maxEventBytes: 64, excluded: map[string]struct{}{}}, q)

@@ -104,10 +104,16 @@ func PreviewText(text string, limit int) string {
 }
 
 func EnqueueRequest(event RequestEvent) {
+	if strings.TrimSpace(event.RequestId) == "" {
+		return
+	}
 	enqueue(requestPath, event.TokenName, event)
 }
 
 func EnqueueUsage(event UsageEvent) {
+	if strings.TrimSpace(event.RequestId) == "" {
+		return
+	}
 	enqueue(usagePath, event.TokenName, event)
 }
 
