@@ -20,7 +20,7 @@
 
 這個倉庫是基於 [QuantumNous/new-api](https://github.com/QuantumNous/new-api) 的稽核專用 fork。
 
-它不是重新實作的閘道，也不改變 New-API 的核心業務邏輯。這個 fork 只增加一組很小的稽核採集 hook，用來把 New-API 中已經解析到的請求資訊和結算後的 token 用量，非同步上報給獨立的 `token-audit` 稽核服務。
+它不是重新實作的閘道，也不改變 New-API 的核心業務邏輯。這個 fork 只增加一組很小的稽核採集 hook，用來把 New-API 中已經解析到的請求資訊和結算後的 token 用量，非同步上報給獨立的 [`token-audit`](https://github.com/Bigduang/new-api-audit-for-company) 稽核服務。
 
 目標是支援企業內部的 Token 稽核需求：
 

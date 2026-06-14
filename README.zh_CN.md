@@ -20,7 +20,7 @@
 
 这个仓库是基于 [QuantumNous/new-api](https://github.com/QuantumNous/new-api) 的审计专用 fork。
 
-它不是一个重新实现的网关，也不改变 New-API 的核心业务逻辑。这个 fork 只增加一组很小的审计采集 hook，用来把 New-API 中已经解析到的请求信息和结算后的 token 用量，异步上报给独立的 `token-audit` 审计服务。
+它不是一个重新实现的网关，也不改变 New-API 的核心业务逻辑。这个 fork 只增加一组很小的审计采集 hook，用来把 New-API 中已经解析到的请求信息和结算后的 token 用量，异步上报给独立的 [`token-audit`](https://github.com/Bigduang/new-api-audit-for-company) 审计服务。
 
 目标是支持企业内部的 Token 审计需求：
 

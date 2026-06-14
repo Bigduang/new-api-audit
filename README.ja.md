@@ -20,7 +20,7 @@
 
 このリポジトリは [QuantumNous/new-api](https://github.com/QuantumNous/new-api) をベースにした監査専用 fork です。
 
-新しいゲートウェイを作り直すものではなく、New-API の主要な業務ロジックも変更しません。この fork は小さな監査収集 hook だけを追加し、New-API が解析済みのリクエスト情報と精算後の token 使用量を、独立した `token-audit` サービスへ非同期で送信します。
+新しいゲートウェイを作り直すものではなく、New-API の主要な業務ロジックも変更しません。この fork は小さな監査収集 hook だけを追加し、New-API が解析済みのリクエスト情報と精算後の token 使用量を、独立した [`token-audit`](https://github.com/Bigduang/new-api-audit-for-company) サービスへ非同期で送信します。
 
 目的は企業内の Token 監査要件を満たすことです：
 

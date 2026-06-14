@@ -20,7 +20,7 @@
 
 This repository is an audit-focused fork of [QuantumNous/new-api](https://github.com/QuantumNous/new-api).
 
-It is not a new gateway implementation and does not change New-API's core business logic. It only adds a small set of audit collection hooks that asynchronously report parsed request metadata and settled token usage to an independent `token-audit` service.
+It is not a new gateway implementation and does not change New-API's core business logic. It only adds a small set of audit collection hooks that asynchronously report parsed request metadata and settled token usage to an independent [`token-audit`](https://github.com/Bigduang/new-api-audit-for-company) service.
 
 The goal is to support internal enterprise token auditing:
 

@@ -54,7 +54,7 @@
 
 ## Token Audit Fork
 
-This repository is a minimal audit-focused fork of [QuantumNous/new-api](https://github.com/QuantumNous/new-api). It keeps New-API's main gateway behavior intact and adds a small asynchronous event sender for a separate `token-audit` service.
+This repository is a minimal audit-focused fork of [QuantumNous/new-api](https://github.com/QuantumNous/new-api). It keeps New-API's main gateway behavior intact and adds a small asynchronous event sender for a separate [`token-audit`](https://github.com/Bigduang/new-api-audit-for-company) service.
 
 The fork emits two signed event streams:
 

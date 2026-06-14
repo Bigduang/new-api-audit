@@ -20,7 +20,7 @@
 
 Ce dépôt est un fork orienté audit de [QuantumNous/new-api](https://github.com/QuantumNous/new-api).
 
-Il ne réimplémente pas la passerelle et ne modifie pas la logique métier principale de New-API. Il ajoute uniquement quelques hooks de collecte pour envoyer, de façon asynchrone, les métadonnées de requête déjà analysées par New-API et l'utilisation de tokens après règlement vers un service indépendant `token-audit`.
+Il ne réimplémente pas la passerelle et ne modifie pas la logique métier principale de New-API. Il ajoute uniquement quelques hooks de collecte pour envoyer, de façon asynchrone, les métadonnées de requête déjà analysées par New-API et l'utilisation de tokens après règlement vers un service indépendant [`token-audit`](https://github.com/Bigduang/new-api-audit-for-company).
 
 L'objectif est de répondre aux besoins d'audit internes en entreprise :
 
