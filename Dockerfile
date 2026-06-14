@@ -28,10 +28,13 @@ ARG TARGETARCH
 ENV GOOS=${TARGETOS:-linux} GOARCH=${TARGETARCH:-amd64}
 ENV GOEXPERIMENT=greenteagc
 
+ARG GOPROXY
+
 WORKDIR /build
 
 ADD go.mod go.sum ./
-RUN go mod download
+RUN if [ -n "$GOPROXY" ]; then go env -w GOPROXY="$GOPROXY"; fi \
+    && go mod download
 
 COPY . .
 COPY --from=builder /build/web/default/dist ./web/default/dist

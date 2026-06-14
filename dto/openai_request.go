@@ -3,6 +3,8 @@ package dto
 import (
 	"encoding/json"
 	"fmt"
+	"mime"
+	"path/filepath"
 	"strings"
 
 	"github.com/QuantumNous/new-api/common"
@@ -213,12 +215,22 @@ func (r *GeneralOpenAIRequest) ToMap() map[string]any {
 	return result
 }
 
+func IsOpenAIReasoningOModel(modelName string) bool {
+	return strings.HasPrefix(modelName, "o1") ||
+		strings.HasPrefix(modelName, "o3") ||
+		strings.HasPrefix(modelName, "o4")
+}
+
+func IsOpenAIGPT5Model(modelName string) bool {
+	return strings.HasPrefix(modelName, "gpt-5")
+}
+
 func (r *GeneralOpenAIRequest) GetSystemRoleName() string {
-	if strings.HasPrefix(r.Model, "o") {
+	if IsOpenAIReasoningOModel(r.Model) {
 		if !strings.HasPrefix(r.Model, "o1-mini") && !strings.HasPrefix(r.Model, "o1-preview") {
 			return "developer"
 		}
-	} else if strings.HasPrefix(r.Model, "gpt-5") {
+	} else if IsOpenAIGPT5Model(r.Model) {
 		return "developer"
 	}
 	return "system"
@@ -386,7 +398,7 @@ func (m *MediaContent) ToFileSource() types.FileSource {
 		if file == nil || file.FileData == "" {
 			return nil
 		}
-		return types.NewFileSourceFromData(file.FileData, "")
+		return types.NewFileSourceFromData(file.FileData, mimeTypeFromFileName(file.FileName))
 	case ContentTypeVideoUrl:
 		video := m.GetVideoUrl()
 		if video == nil || video.Url == "" {
@@ -395,6 +407,18 @@ func (m *MediaContent) ToFileSource() types.FileSource {
 		return types.NewFileSourceFromData(video.Url, "")
 	}
 	return nil
+}
+
+func mimeTypeFromFileName(fileName string) string {
+	ext := strings.ToLower(filepath.Ext(fileName))
+	if ext == "" {
+		return ""
+	}
+	mimeType := mime.TypeByExtension(ext)
+	if idx := strings.Index(mimeType, ";"); idx >= 0 {
+		mimeType = mimeType[:idx]
+	}
+	return strings.TrimSpace(mimeType)
 }
 
 type MessageImageUrl struct {
