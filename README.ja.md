@@ -7,7 +7,7 @@
 **Token 利用監査向けの New-API 最小フォーク**
 
 <p align="center">
-  <a href="./README.md">简体中文</a> |
+  <a href="./README.zh_CN.md">简体中文</a> |
   <a href="./README.en.md">English</a> |
   <a href="./README.zh_TW.md">繁體中文</a> |
   <a href="./README.fr.md">Français</a> |
@@ -210,6 +210,10 @@ rebase で衝突した場合は、優先して確認する場所：
 - `controller/relay.go` のリクエスト解析後、センシティブワードチェック、token 推定付近。
 - `model/log.go` の `RecordConsumeLog`。
 - `common.RequestIdKey` と `common.UpstreamRequestIdKey` がまだ存在するか。
+
+## 友好リンク
+
+- [LinuxDO](https://linux.do/): 高品質な技術コミュニティ。
 
 ## 上流 New-API との関係
 

@@ -7,7 +7,7 @@
 **Fork minimal de New-API pour l'audit d'utilisation des tokens**
 
 <p align="center">
-  <a href="./README.md">简体中文</a> |
+  <a href="./README.zh_CN.md">简体中文</a> |
   <a href="./README.en.md">English</a> |
   <a href="./README.zh_TW.md">繁體中文</a> |
   <strong>Français</strong> |
@@ -210,6 +210,10 @@ En cas de conflit de rebase, vérifier :
 - La zone d'analyse de requête dans `controller/relay.go`, près des contrôles de mots sensibles et de l'estimation des tokens.
 - `RecordConsumeLog` dans `model/log.go`.
 - L'existence de `common.RequestIdKey` et `common.UpstreamRequestIdKey`.
+
+## Liens Amis
+
+- [LinuxDO](https://linux.do/) : communauté technique de qualité.
 
 ## Relation avec New-API upstream
 

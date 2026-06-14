@@ -211,6 +211,10 @@ docker build -t new-api-audit:audit-hook .
 - `model/log.go` 中 `RecordConsumeLog` 记录消费日志的位置。
 - `common.RequestIdKey` 和 `common.UpstreamRequestIdKey` 是否仍然存在。
 
+## 友情链接
+
+- [LinuxDO](https://linux.do/)：高质量技术社区。
+
 ## 与上游 New-API 的关系
 
 本仓库保留 New-API 的原始能力和许可证，仅增加企业内部审计所需的最小 hook。

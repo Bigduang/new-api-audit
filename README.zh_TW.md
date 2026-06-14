@@ -7,7 +7,7 @@
 **面向 Token 用量稽核的 New-API 最小二開版本**
 
 <p align="center">
-  <a href="./README.md">简体中文</a> |
+  <a href="./README.zh_CN.md">简体中文</a> |
   <a href="./README.en.md">English</a> |
   <strong>繁體中文</strong> |
   <a href="./README.fr.md">Français</a> |
@@ -210,6 +210,10 @@ docker build -t new-api-audit:audit-hook .
 - `controller/relay.go` 中請求解析後、敏感詞檢查和 token 估算附近。
 - `model/log.go` 中 `RecordConsumeLog` 記錄消費日誌的位置。
 - `common.RequestIdKey` 和 `common.UpstreamRequestIdKey` 是否仍然存在。
+
+## 友情連結
+
+- [LinuxDO](https://linux.do/)：高品質技術社群。
 
 ## 與上游 New-API 的關係
 

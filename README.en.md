@@ -7,7 +7,7 @@
 **A minimal New-API fork for token usage auditing**
 
 <p align="center">
-  <a href="./README.md">简体中文</a> |
+  <a href="./README.zh_CN.md">简体中文</a> |
   <strong>English</strong> |
   <a href="./README.zh_TW.md">繁體中文</a> |
   <a href="./README.fr.md">Français</a> |
@@ -210,6 +210,10 @@ If a rebase conflict occurs, check:
 - The request parsing area in `controller/relay.go`, near sensitive-word checks and token estimation.
 - `RecordConsumeLog` in `model/log.go`.
 - Whether `common.RequestIdKey` and `common.UpstreamRequestIdKey` still exist.
+
+## Friendly Links
+
+- [LinuxDO](https://linux.do/): A high-quality technical community.
 
 ## Upstream Relationship
 
