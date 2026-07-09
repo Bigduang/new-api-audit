@@ -192,13 +192,10 @@ go test ./audit ./model ./controller -run '^$'
 
 ```bash
 git remote add upstream https://github.com/QuantumNous/new-api.git
-git fetch upstream
+git fetch upstream --tags
 
-git switch main
-git merge upstream/main
-
-git switch audit-hook
-git rebase main
+git switch -c upgrade/upstream-vX.Y.Z
+git merge --no-ff vX.Y.Z
 
 gofmt -w audit/sender.go controller/relay.go model/log.go
 go test ./audit ./model ./controller -run '^$'
@@ -218,6 +215,8 @@ docker build -t new-api-audit:audit-hook .
 ## 与上游 New-API 的关系
 
 本仓库保留 New-API 的原始能力和许可证，仅增加企业内部审计所需的最小 hook。
+
+当前代码基线为上游 `v1.0.0-rc.20`。New-API 可通过 `LOG_SQL_DSN` 单独使用 ClickHouse 保存网关日志；独立 `token-audit` 服务仍使用自己的 SQLite 审计库，两者职责不同。
 
 原项目文档：
 

@@ -192,13 +192,10 @@ The fork keeps the custom change surface small so it can follow upstream New-API
 
 ```bash
 git remote add upstream https://github.com/QuantumNous/new-api.git
-git fetch upstream
+git fetch upstream --tags
 
-git switch main
-git merge upstream/main
-
-git switch audit-hook
-git rebase main
+git switch -c upgrade/upstream-vX.Y.Z
+git merge --no-ff vX.Y.Z
 
 gofmt -w audit/sender.go controller/relay.go model/log.go
 go test ./audit ./model ./controller -run '^$'
@@ -218,6 +215,8 @@ If a rebase conflict occurs, check:
 ## Upstream Relationship
 
 This repository keeps New-API's original capabilities and license, and only adds the minimal hooks required for internal auditing.
+
+The current code baseline is upstream `v1.0.0-rc.20`. New-API may use ClickHouse separately for gateway logs through `LOG_SQL_DSN`; the standalone `token-audit` service continues to use its own SQLite audit database, with a different responsibility.
 
 Upstream project references:
 

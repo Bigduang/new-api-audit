@@ -192,13 +192,10 @@ go test ./audit ./model ./controller -run '^$'
 
 ```bash
 git remote add upstream https://github.com/QuantumNous/new-api.git
-git fetch upstream
+git fetch upstream --tags
 
-git switch main
-git merge upstream/main
-
-git switch audit-hook
-git rebase main
+git switch -c upgrade/upstream-vX.Y.Z
+git merge --no-ff vX.Y.Z
 
 gofmt -w audit/sender.go controller/relay.go model/log.go
 go test ./audit ./model ./controller -run '^$'
@@ -218,6 +215,8 @@ rebase で衝突した場合は、優先して確認する場所：
 ## 上流 New-API との関係
 
 このリポジトリは New-API の元の機能とライセンスを保持し、社内監査に必要な最小 hook のみを追加しています。
+
+現在のコードベースは上流 `v1.0.0-rc.20` です。New-API は `LOG_SQL_DSN` 経由でゲートウェイログだけを ClickHouse に保存できますが、独立した `token-audit` サービスは引き続き専用の SQLite 監査 DB を使用し、両者の役割は異なります。
 
 元プロジェクトの参照：
 
