@@ -1,6 +1,6 @@
 <div align="center">
 
-![new-api](/web/default/public/logo.png)
+![new-api](/web/public/logo.png)
 
 # New API Audit Fork
 
@@ -216,7 +216,7 @@ docker build -t new-api-audit:audit-hook .
 
 本倉庫保留 New-API 的原始能力和許可證，僅增加企業內部稽核所需的最小 hook。
 
-目前程式碼基線為上游 `v1.0.0-rc.20`。New-API 可透過 `LOG_SQL_DSN` 單獨使用 ClickHouse 保存閘道日誌；獨立 `token-audit` 服務仍使用自己的 SQLite 稽核資料庫，兩者職責不同。
+目前程式碼基線為上游 `v1.0.0-rc.22`。New-API 可透過 `LOG_SQL_DSN` 單獨使用 ClickHouse 保存閘道日誌；獨立 `token-audit` 服務仍使用自己的 SQLite 稽核資料庫，兩者職責不同。
 
 原專案文件：
 

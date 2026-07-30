@@ -1,6 +1,6 @@
 <div align="center">
 
-![new-api](/web/default/public/logo.png)
+![new-api](/web/public/logo.png)
 
 # New API Audit Fork
 
@@ -216,7 +216,7 @@ rebase で衝突した場合は、優先して確認する場所：
 
 このリポジトリは New-API の元の機能とライセンスを保持し、社内監査に必要な最小 hook のみを追加しています。
 
-現在のコードベースは上流 `v1.0.0-rc.20` です。New-API は `LOG_SQL_DSN` 経由でゲートウェイログだけを ClickHouse に保存できますが、独立した `token-audit` サービスは引き続き専用の SQLite 監査 DB を使用し、両者の役割は異なります。
+現在のコードベースは上流 `v1.0.0-rc.22` です。New-API は `LOG_SQL_DSN` 経由でゲートウェイログだけを ClickHouse に保存できますが、独立した `token-audit` サービスは引き続き専用の SQLite 監査 DB を使用し、両者の役割は異なります。
 
 元プロジェクトの参照：
 

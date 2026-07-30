@@ -1,6 +1,6 @@
 <div align="center">
 
-![new-api](/web/default/public/logo.png)
+![new-api](/web/public/logo.png)
 
 # New API Audit Fork
 
@@ -216,7 +216,7 @@ En cas de conflit de rebase, vérifier :
 
 Ce dépôt conserve les fonctionnalités et la licence originales de New-API, et ajoute seulement les hooks minimaux requis pour l'audit interne.
 
-La base de code actuelle correspond à l'upstream `v1.0.0-rc.20`. New-API peut utiliser ClickHouse séparément pour les journaux de passerelle via `LOG_SQL_DSN` ; le service autonome `token-audit` continue d'utiliser sa propre base d'audit SQLite, avec une responsabilité différente.
+La base de code actuelle correspond à l'upstream `v1.0.0-rc.22`. New-API peut utiliser ClickHouse séparément pour les journaux de passerelle via `LOG_SQL_DSN` ; le service autonome `token-audit` continue d'utiliser sa propre base d'audit SQLite, avec une responsabilité différente.
 
 Références du projet original :
 
