@@ -8,12 +8,12 @@ import (
 
 	"github.com/QuantumNous/new-api/common"
 	"github.com/QuantumNous/new-api/constant"
-	"github.com/QuantumNous/new-api/dto"
 	"github.com/QuantumNous/new-api/logger"
 	relaycommon "github.com/QuantumNous/new-api/relay/common"
 	"github.com/QuantumNous/new-api/relay/helper"
+	"github.com/QuantumNous/new-api/relaykit/dto"
+	"github.com/QuantumNous/new-api/relaykit/types"
 	"github.com/QuantumNous/new-api/service"
-	"github.com/QuantumNous/new-api/types"
 
 	"github.com/gin-gonic/gin"
 )
@@ -22,7 +22,10 @@ func AlphaSearchHelper(c *gin.Context, info *relaycommon.RelayInfo) (newAPIError
 	info.InitChannelMeta(c)
 
 	switch info.ChannelType {
-	case constant.ChannelTypeSub2API, constant.ChannelTypeCodex, constant.ChannelTypeAdvancedCustom:
+	case constant.ChannelTypeSub2API,
+		constant.ChannelTypeNewAPI,
+		constant.ChannelTypeCodex,
+		constant.ChannelTypeAdvancedCustom:
 	default:
 		// Allow retry onto another channel that may support this endpoint.
 		return types.NewError(
@@ -59,12 +62,11 @@ func AlphaSearchHelper(c *gin.Context, info *relaycommon.RelayInfo) (newAPIError
 	}
 
 	logger.LogDebug(c, "requestBody: %s", jsonData)
-	body, size, closer, err := relaycommon.NewOutboundJSONBody(jsonData)
+	body, closer, err := relaycommon.NewOutboundJSONBody(jsonData)
 	if err != nil {
 		return types.NewError(err, types.ErrorCodeConvertRequestFailed, types.ErrOptionWithSkipRetry())
 	}
 	defer closer.Close()
-	info.UpstreamRequestBodySize = size
 
 	adaptor := GetAdaptor(info.ApiType)
 	if adaptor == nil {

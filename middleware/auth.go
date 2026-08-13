@@ -12,10 +12,10 @@ import (
 	"github.com/QuantumNous/new-api/i18n"
 	"github.com/QuantumNous/new-api/logger"
 	"github.com/QuantumNous/new-api/model"
+	"github.com/QuantumNous/new-api/relaykit/types"
 	"github.com/QuantumNous/new-api/service"
 	"github.com/QuantumNous/new-api/service/authz"
 	"github.com/QuantumNous/new-api/setting/ratio_setting"
-	"github.com/QuantumNous/new-api/types"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -502,6 +502,16 @@ func SetupContextForToken(c *gin.Context, token *model.Token, parts ...string) e
 	}
 	common.SetContextKey(c, constant.ContextKeyTokenGroup, token.Group)
 	common.SetContextKey(c, constant.ContextKeyTokenCrossGroupRetry, token.CrossGroupRetry)
+	if token.AutoGroups != "" {
+		autoGroups, err := token.GetAutoGroups()
+		if err != nil {
+			common.SysError(fmt.Sprintf("failed to parse auto groups for token %d: %v", token.Id, err))
+			autoGroups = []string{}
+			common.SetContextKey(c, constant.ContextKeyTokenAutoGroups, autoGroups)
+		} else if len(autoGroups) > 0 {
+			common.SetContextKey(c, constant.ContextKeyTokenAutoGroups, autoGroups)
+		}
+	}
 	if len(parts) > 1 {
 		if model.IsAdmin(token.UserId) {
 			c.Set("specific_channel_id", parts[1])
