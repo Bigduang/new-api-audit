@@ -3,7 +3,6 @@ package oaichat
 import (
 	"context"
 	"encoding/base64"
-	"encoding/json"
 	"fmt"
 	"strings"
 
