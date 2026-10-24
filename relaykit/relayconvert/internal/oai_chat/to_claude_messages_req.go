@@ -2,7 +2,6 @@ package oaichat
 
 import (
 	"context"
-	"encoding/base64"
 	"fmt"
 	"strings"
 
@@ -13,6 +12,7 @@ import (
 	sharedclaude "github.com/QuantumNous/new-api/relaykit/relayconvert/internal/shared/claude"
 	kitutil "github.com/QuantumNous/new-api/relaykit/relayconvert/kitutil"
 	"github.com/QuantumNous/new-api/relaykit/relayconvert/reasoning"
+	"github.com/QuantumNous/new-api/relaykit/types"
 )
 
 func OpenAIChatRequestToClaudeMessages(c context.Context, info convmeta.Meta, textRequest dto.GeneralOpenAIRequest) (*dto.ClaudeRequest, error) {
@@ -127,6 +127,7 @@ func OpenAIChatRequestToClaudeMessages(c context.Context, info convmeta.Meta, te
 	lastMessage := dto.Message{
 		Role: "tool",
 	}
+	lastMessageHasPlaceholder := false
 	for _, message := range textRequest.Messages {
 		switch message.Role {
 		case "":
@@ -159,15 +160,35 @@ func OpenAIChatRequestToClaudeMessages(c context.Context, info convmeta.Meta, te
 		}
 		if lastMessage.Role == message.Role && lastMessage.Role != "tool" {
 			if lastMessage.IsStringContent() && message.IsStringContent() {
-				fmtMessage.SetStringContent(fmt.Sprintf("%s %s", lastMessage.StringContent(), message.StringContent()))
+				previousToolCalls := lastMessage.ParseToolCalls()
+				currentToolCalls := fmtMessage.ParseToolCalls()
+				if len(previousToolCalls) > 0 || len(currentToolCalls) > 0 {
+					// Keep both messages' tool calls so later tool results still
+					// match a tool_use block.
+					texts := make([]string, 0, 2)
+					// Omit only text injected for an empty tool-call message.
+					isToolPlaceholder := lastMessageHasPlaceholder && len(previousToolCalls) > 0
+					if previousText := lastMessage.StringContent(); previousText != "" && !isToolPlaceholder {
+						texts = append(texts, previousText)
+					}
+					if currentText := message.StringContent(); currentText != "" {
+						texts = append(texts, currentText)
+					}
+					fmtMessage.SetStringContent(strings.Join(texts, " "))
+					fmtMessage.SetToolCalls(append(previousToolCalls, currentToolCalls...))
+				} else {
+					fmtMessage.SetStringContent(fmt.Sprintf("%s %s", lastMessage.StringContent(), message.StringContent()))
+				}
 				formatMessages = formatMessages[:len(formatMessages)-1]
 			}
 		}
-		if fmtMessage.Content == nil || (fmtMessage.IsStringContent() && fmtMessage.StringContent() == "") {
+		hasPlaceholder := fmtMessage.Content == nil || (fmtMessage.IsStringContent() && fmtMessage.StringContent() == "")
+		if hasPlaceholder {
 			fmtMessage.SetStringContent("...")
 		}
 		formatMessages = append(formatMessages, fmtMessage)
 		lastMessage = fmtMessage
+		lastMessageHasPlaceholder = hasPlaceholder
 	}
 
 	claudeMessages := make([]dto.ClaudeMessage, 0)
@@ -265,38 +286,35 @@ func OpenAIChatRequestToClaudeMessages(c context.Context, info convmeta.Meta, te
 					if source == nil {
 						continue
 					}
-					base64Data, mimeType, err := relaymedia.ResolveBase64Data(c, source, "formatting image for Claude")
-					if err != nil {
-						return nil, fmt.Errorf("get file data failed: %s", err.Error())
-					}
-					claudeMediaMessage := dto.ClaudeMediaMessage{
-						Source: &dto.ClaudeMessageSource{
-							Type: "base64",
-						},
-					}
-					if strings.HasPrefix(mimeType, "application/pdf") {
-						claudeMediaMessage.Type = "document"
-					} else if strings.HasPrefix(mimeType, "image/") {
-						claudeMediaMessage.Type = "image"
-					} else if strings.HasPrefix(mimeType, "text/") {
-						textData, err := base64.StdEncoding.DecodeString(base64Data)
+					// Claude content blocks carry images, PDF documents, and text
+					// documents; audio and video have no Claude block.
+					reason := fmt.Sprintf("Claude Messages cannot carry %s content", mediaMessage.Type)
+					var block dto.ClaudeMediaMessage
+					if mediaMessage.Type != dto.ContentTypeInputAudio && mediaMessage.Type != dto.ContentTypeVideoUrl {
+						base64Data, mimeType, err := relaymedia.ResolveBase64Data(c, source, "formatting image for Claude")
 						if err != nil {
-							return nil, fmt.Errorf("decode text file failed: %s", err.Error())
+							return nil, fmt.Errorf("get file data failed: %s", err.Error())
 						}
-						if len(textData) > 0 {
-							claudeMediaMessages = append(claudeMediaMessages, dto.ClaudeMediaMessage{
-								Type: "text",
-								Text: kitutil.GetPointer(string(textData)),
-							})
-						}
-						continue
-					} else {
+						block, reason = sharedclaude.MediaBlock(base64Data, mimeType, mediaMessage.Type == dto.ContentTypeImageURL)
+					}
+					if reason != "" {
+						convdiag.Add(c, types.ConversionDiagnostic{
+							Code:     "unsupported_media_type",
+							Path:     "messages.content",
+							Message:  reason + "; the part was omitted",
+							Severity: types.ConversionDiagnosticError,
+						})
 						continue
 					}
-
-					claudeMediaMessage.Source.MediaType = mimeType
-					claudeMediaMessage.Source.Data = base64Data
-					claudeMediaMessages = append(claudeMediaMessages, claudeMediaMessage)
+					// Keep text attachments usable on Claude-compatible providers without document blocks.
+					if block.Source != nil && block.Source.Type == "text" {
+						text := kitutil.Interface2String(block.Source.Data)
+						if text == "" {
+							continue
+						}
+						block = dto.ClaudeMediaMessage{Type: "text", Text: kitutil.GetPointer(text)}
+					}
+					claudeMediaMessages = append(claudeMediaMessages, block)
 					continue
 				}
 			}
@@ -316,6 +334,10 @@ func OpenAIChatRequestToClaudeMessages(c context.Context, info convmeta.Meta, te
 						Input: inputObj,
 					})
 				}
+			}
+			if len(claudeMediaMessages) == 0 {
+				// Every part was omitted; Claude rejects an empty content array.
+				claudeMediaMessages = append(claudeMediaMessages, dto.ClaudeMediaMessage{Type: "text", Text: kitutil.GetPointer("...")})
 			}
 			claudeMessage.Content = claudeMediaMessages
 		}
